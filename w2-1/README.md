@@ -40,4 +40,8 @@ contract Bank{
 ![](2022-03-05-12-41-34.png)
 
 3.编写 Bank合约withdraw(), 实现提取出所有的 ETH
+交易hash:https://ropsten.etherscan.io/tx/0x286135bd32bf51619c10d247345b97595150891ffc1b8d76b6f76890609e9903 
+
+交易截图：
 ![](2022-03-05-12-48-55.png)
+![](2022-03-05-12-55-19.png)
