@@ -4,6 +4,8 @@ import { ethers } from 'ethers'
 import myERC20Addr from '../../../deployments/dev/MyERC20.json';
 import myERC20Abi from '../../../deployments/abi/MyERC20.json';
 
+import vaultAddr from '../../../deployments/dev/Vault.json'
+import vaultAbi from '../../../deployments/abi/Vault.json'
 
 import { premitTypedDate } from "../typedData.js";
 
@@ -26,7 +28,20 @@ export default {
       stakeAmount: null,
       mintTokenAmount: null,
       addCount: null,
-      addNum: null
+      addNum: null,
+
+      // 存款金额
+      depositAmount: null,
+      // 存款地址
+      depositAddr: null,
+      // 提取地址
+      withdrawAddr: null,
+      // 提取金额
+      withdrawAmount: null,
+      // 查询地址
+      balanceAddr: null,
+      // 查询地址余额
+      balanceAmount: null
 
     }
   },
@@ -65,6 +80,7 @@ export default {
     async initContract() {
       this.erc20Token = new ethers.Contract(myERC20Addr.address, 
         myERC20Abi, this.signer);
+      this.vault = new ethers.Contract(vaultAddr.address, vaultAbi, this.signer);
 
     }, 
 
@@ -156,6 +172,23 @@ export default {
 
     add() {
       this.erc20Token.add(this.addNum);
+    },
+
+    deposit() {
+      this.erc20Token.approve(vaultAddr.address,ethers.utils.parseUnits(this.depositAmount));
+      this.vault.deposit(this.depositAddr,ethers.utils.parseUnits(this.depositAmount, 18));
+    },
+
+    withdraw() {
+      this.vault.withdrawToken(this.withdrawAddr);
+    },
+
+    balanceMethod() {
+      this.vault.balanceOf(this.balanceAddr).then((r) => {
+        this.balanceAmount = ethers.utils.formatUnits(r, 18);
+      });
+
+
     }
   }
 }
@@ -172,7 +205,7 @@ export default {
         <br /> 我的余额 : {{ balance  }}
         <!-- <br /> 我的余额 : {{ addCount  }} -->
       </div>
-<!--
+
       <div >
         <br />转账到:
         <input type="text" v-model="recipient" />
@@ -181,7 +214,7 @@ export default {
         <br />
         <button @click="transfer()"> 转账 </button>
       </div>
--->
+
     <div >
       <input v-model="mintTokenAmount" placeholder="增发数"/>
       <button @click="mintToken()">增发</button>
@@ -193,7 +226,35 @@ export default {
       <button @click="add()">加</button>
     </div> -->
 
+    <div><hr><br /></div>
+
+    <div>
+      <h2><center><b>Vault</b></center></h2>
+    </div>
+
+    <div >
+      <br />存款到:
+      <input type="text" v-model="depositAddr" />
+      <br />存款金额：
+      <input v-model="depositAmount" placeholder="存款数"/>
+      <button @click="deposit()">存款</button>
+    </div>
+
+    <div >
+      <br />提取地址:
+      <input type="text" v-model="withdrawAddr" />
+      <button @click="withdraw()">提取</button>
+    </div>
+
+    <div >
+      <br />账户余额查询:
+      <br />账户地址
+      <input type="text" v-model="balanceAddr" />
+      <button @click="balanceMethod()">查询</button>
+      <br /> 我的余额 : {{ balanceAmount  }}
+    </div>
   </div>
+  
 </template>
 
 <style scoped>
